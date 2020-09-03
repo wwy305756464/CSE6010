@@ -5,7 +5,6 @@
 #include<sys/malloc.h>
 #include<stdlib.h>
 
-// TODO: cmakelist
 
 // use typedef to fefine the structure LLQueue to represent linked-list queue
 typedef struct LLQueue{
