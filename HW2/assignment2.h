@@ -47,5 +47,6 @@ void create_insert_test(LLQueue* LLQ, double data1, double data2, double data3, 
 void max_min_test(LLQueue* LLQ);
 void search_test(LLQueue* LLQ, double front_ele, double middle_ele, double end_ele, double not_present_ele);
 void delete_test(LLQueue* LLQ, LLQueue* emptyLLQ);
+void free_test(LLQueue* LLQ, LLQueue* emptyLLQ);
 
 #endif

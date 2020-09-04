@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "assignment2.h"
 
-// FIXME: 加上返回值，不是void，而是可以返回构建好的LLQ链表
 void create_insert_test(LLQueue* LLQ, double data1, double data2, double data3, double data4, double data5, double data6) {
     printf("--------------------- CREATE AND INSERT TEST ----------------------- \n");
 
@@ -41,7 +40,6 @@ void create_insert_test(LLQueue* LLQ, double data1, double data2, double data3, 
 
 void max_min_test(LLQueue* LLQ) {
     printf("-------------------------- MAX AND MIN TEST --------------------------- \n");
-    // TODO: 记得用output来代替这些50, 34.24, 66, 22.6, 99.99, 63
     LLQ = LLQ_create();
     LLQ_insert(LLQ, 50);
     LLQ_insert(LLQ, 34.24);
@@ -63,7 +61,6 @@ void max_min_test(LLQueue* LLQ) {
 
 void search_test(LLQueue* LLQ, double front_ele, double middle_ele, double end_ele, double not_present_ele) {
     printf("------------------------------ SEARCH TEST ---------------------------- \n");
-    // TODO: 记得用output来代替这些50, 34.24, 66, 22.6, 99.99, 63
     LLQ = LLQ_create();
     LLQ_insert(LLQ, 50);
     LLQ_insert(LLQ, 34.24);
@@ -90,7 +87,6 @@ void search_test(LLQueue* LLQ, double front_ele, double middle_ele, double end_e
 
 void delete_test(LLQueue* LLQ, LLQueue* emptyLLQ) {
     printf("--------------------------- DELETE TEST ------------------------------ \n");
-    // TODO: 记得用output来代替这些50, 34.24, 66, 22.6, 99.99, 63
     LLQ = LLQ_create();
     LLQ_insert(LLQ, 50);
     LLQ_insert(LLQ, 34.24);
@@ -121,43 +117,24 @@ void delete_test(LLQueue* LLQ, LLQueue* emptyLLQ) {
     LLQ_print(emptyLLQ);
 }
 
+void free_test(LLQueue* LLQ, LLQueue* emptyLLQ) {
+    printf("\n--------------------------- FREE TEST ------------------------------ \n");
+    LLQ = LLQ_create();
+    LLQ_insert(LLQ, 50);
+    LLQ_insert(LLQ, 34.24);
+    LLQ_insert(LLQ, 66);
+    LLQ_insert(LLQ, 22.6);
+    LLQ_insert(LLQ, 99.99);
+    LLQ_insert(LLQ, 63);
 
-//     // creating the queue:
-//     
+    printf("Before free up the queue, the LLQ is: ");
+    LLQ_print(LLQ);
+    LLQ_free(LLQ);
 
-//     // inserting an item into an empty queue
-//     // data = (void*) malloc (sizeof(void));
-//     // *data = 50;
-//     LLQ_insert(LLQ, 50);
+    printf("\nNow if the input queue is empty: \n");
 
-//     // inserting another 4 items into the queue
-//     LLQ_insert(LLQ, 49);
-//     LLQ_insert(LLQ, 20.02);
-//     LLQ_insert(LLQ, 34);
-//     LLQ_insert(LLQ, 60);
-
-//     // inserting an item into a queue containing at least 4 elements
-//     LLQ_insert(LLQ, 12.34);
-//     LLQ_print(LLQ);
-
-//     // check delete
-//     LLQ_delete(LLQ);
-//     LLQ_print(LLQ);
-
-//     
-//     // double * ptr = LLQ_Search(LLQ, 34);
-//     // printf("search result: %p \n", ptr);
-
-
-//     // returning the maximum and minimum of a queue containing at least 4 elements
-//     double min = LLQ_minimum(LLQ);
-//     printf("min value is: %.2f \n", min);
-
-//     double max = LLQ_maximum(LLQ);
-//     printf("max value is: %.2f \n", max);
-
-//     // count
-//     unsigned int count = LLQ_count(LLQ);
-//     printf("count number is: %d \n", count);
-    
-// }
+    emptyLLQ = LLQ_create();
+    printf("Before free up the queue, the LLQ is: ");
+    LLQ_print(emptyLLQ);
+    LLQ_free(emptyLLQ);
+}
