@@ -148,12 +148,11 @@ unsigned int LLQ_count(LLQueue *LLQ){
 
 // print the data items stored in the queue in order from oldest to newest without 
 // changing the contents of the queue
-// FIXME: 想修改成链表的形式，但是怎么省略掉最后一个 -> ？
 void LLQ_print(LLQueue *LLQ){
         LLQ = LLQ -> next;
     double val;
 
-    if(LLQ == NULL){
+    if(LLQ == NULL || LLQ -> next == NULL){
         printf("The linked list queue is empty");
     }
 
@@ -166,6 +165,7 @@ void LLQ_print(LLQueue *LLQ){
     }
     
     printf("\n");
+    return;
 }
 
 
@@ -173,15 +173,28 @@ void LLQ_print(LLQueue *LLQ){
 void LLQ_free(LLQueue *LLQ){
     if (LLQ == NULL) {
         printf("Error! Invalid linked list queue. \n");
+        return;
     }
     
-	LLQueue* prenode;
+	LLQueue* prenode = LLQ -> next;
+    if(!prenode) {
+        free(LLQ);
+        printf("Has free up all memory space\n");
+        return;
+    }
 
-	while(LLQ != NULL){
-		prenode = LLQ;
-		LLQ = LLQ -> next;
-		free(prenode);
+    LLQ -> next = NULL;
+    free (LLQ);
+
+    LLQueue *temp;
+
+	while(prenode -> next){
+		temp = prenode -> next;
+		prenode -> next = temp -> next;
+		free(temp);
 	}
 	free(prenode);
+    printf("Has free up all memory space\n");
+    return;
 
 }

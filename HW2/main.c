@@ -3,7 +3,6 @@
 
 int main() {
     LLQueue *LLQ;
-    double *data;
     LLQueue *emptyLLQ;
 
     // test creating a queue, first insert 50 into the empty queue, then continully insert
@@ -18,6 +17,8 @@ int main() {
     search_test(LLQ, 50, 66, 63, 453);
 
     delete_test(LLQ, emptyLLQ);
+
+    free_test(LLQ, emptyLLQ);
 
     
 
