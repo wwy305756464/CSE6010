@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <errno.h>
 #include <limits.h>
 #include "kmeans.h"
@@ -10,13 +9,6 @@
 
 // Main Function
 int main(int argc, char * argv[]) {
-	// Start by reading the input from the command line prompt
-	// In this k-means implementation, the program takes in 5 addition arguments:
-	    //(1) number of cluster;
-		//(2) maximum number of iteration time;
-		//(3) minimum improvement rate used as a threshold to stop k-means;
-		//(4) path of data file;
-		//(5) path of result file;
 
 	if (argc != 3) {
 		print_command(argv[0]);
@@ -48,50 +40,61 @@ int main(int argc, char * argv[]) {
 	const char *file_name = argv[1];					// input file name
 	int cluster_num = (int) long_k;						// number of clusters
 	
-	int iter_num = 40;	// max iteration nums
-	double threshold = 0.2;			// threshold to stop 
-	// const char *output_file = argv[5];					// output file
+	int iter_num = 100;									// max iteration nums
+	double threshold = 0.01;							// threshold to stop 
 
 
 	// initialize:
+	printf(" ---------------------- Initialize --------------------\n");
 	int data_num = 0;
 	int dimension_num = 0;
 	double ** data_matrix_origin = read_data(file_name, &data_num, &dimension_num);
-	// TODO: normalize data
-	double ** normalized_data_matrix = normalize_data(data_matrix_origin, data_num, dimension_num); // FIXME: something is wrong here
+	double ** normalized_data_matrix = normalize_data(data_matrix_origin, data_num, dimension_num); // normalize data
+	
+	// choose to use regular data or normalized data:
+	// double ** data_matrix = data_matrix_origin;
+	double ** data_matrix = normalized_data_matrix;	
+	
+	double ** centroid_matrix_original = initialize_centriods(data_matrix, cluster_num, dimension_num);
+	double ** centroid_matrix_random = initialize_centriods_random(data_matrix, cluster_num, data_num, dimension_num); // randomly select centroids
+	
+	// choose how to initialized centroid: 
+	// double ** centroid_matrix = centroid_matrix_original;
+	double ** centroid_matrix = centroid_matrix_random;
 
-	double ** data_matrix = data_matrix_origin;
-	// double ** data_matrix = normalized_data_matrix;
-	// initialized centroid:
-	// double ** centroid_matrix = initialize_centriods(data_matrix, cluster_num, data_num, dimension_num);
-	double ** centroid_matrix = initialize_centriods_random(data_matrix, cluster_num, data_num, dimension_num); // TODO: 随机
 	double ** distance_matrix = get_distance_matrix(data_matrix, centroid_matrix, cluster_num, data_num, dimension_num);
 	int* cluster_vector = get_cluster_vector(distance_matrix, cluster_num, data_num);
 	int* cluster_point_vector = get_cluster_points_number(data_matrix, cluster_vector, cluster_num, data_num);
 	double RMS = root_mean_square(distance_matrix, cluster_vector, cluster_num, data_num);
-	
+	printf("\n");
+
+	// begin the ieration:
 	int iter = 0;
 	double RMS_diff = -1;
-	// begin training the data
 	while(iter < iter_num) {
-		printf(" ---------------------- %dth iteration --------------------\n", iter);
+		printf(" ---------------------- %dth iteration --------------------\n", iter + 1);
 		update_centroids(data_matrix, centroid_matrix, cluster_vector, cluster_point_vector, cluster_num, data_num, dimension_num);
 		distance_matrix = get_distance_matrix(data_matrix, centroid_matrix, cluster_num, data_num, dimension_num);
 		cluster_vector = get_cluster_vector(distance_matrix, cluster_num, data_num);
 		cluster_point_vector = get_cluster_points_number(data_matrix, cluster_vector, cluster_num, data_num);
 		double new_RMS = root_mean_square(distance_matrix, cluster_vector, cluster_num, data_num);
 		RMS_diff = (RMS - new_RMS) / RMS;
-		printf("RMS_diff: %.2f", RMS_diff); // FIXME：改成打印完整结果
-		if(RMS_diff <= threshold) { // FIXME: 换一种检查方式
+		printf("RMS_diff: %.2f \n\n", RMS_diff); 
+		// break the loop when RMS is smaller than threshold
+		if(RMS_diff <= threshold) { 
 			break;
 		}
+		RMS = new_RMS;
 		iter++;
 	}
 
-	// write the result data used for knn to the output file
-	// writeClusterResults(data_size, feature_size, output_file, data_matrix, cluster_label);
-
-	// set all the spaces free
-	matrix_free(data_matrix, data_num, dimension_num);
+	// free up all used memories
+	matrix_free(data_matrix_origin, data_num, dimension_num);
+	matrix_free(normalized_data_matrix, data_num, dimension_num);
+	matrix_free(centroid_matrix_original, cluster_num, dimension_num);
+	matrix_free(centroid_matrix_random, cluster_num, dimension_num);
+	matrix_free(distance_matrix, data_num, cluster_num);
+	vector_free(cluster_vector, data_num);
+	vector_free(cluster_point_vector, cluster_num);
 	return 1;
 }
