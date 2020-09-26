@@ -91,6 +91,11 @@ bool check_constraint_1(int* vector, int matrix_size){
     }
     int num_of_X = sum % 100;
     int num_of_O = sum / 100;
+
+    if (num_of_O <= 3 && num_of_X <= 3){
+        return true;
+    }
+
     if ((num_of_X == matrix_size / 2) && (num_of_O == matrix_size / 2)){
         return true;
     }
@@ -210,6 +215,8 @@ bool compare_array(int* array1, int* array2, int n){  // 两个array完全相等
     return true;
 }
 
+// TODO: final test function, test with three constraints for whole final matrix, can write three functions
+
 /*
     allocate memory for int vector
     INPUT: vector's length
@@ -321,3 +328,4 @@ int*** matrix_allocate_3D(int row_num, int col_num) {
 	return matrix;
 }
 
+// TODO: memory free function
