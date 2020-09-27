@@ -48,22 +48,21 @@ char** read_origin_data(const char *file_name,  int *matrix_size){
 }
 
 
-// generate a n * 2 matrix, to store location of each O or X
+// generate a matrix, to store location of each O or X
 int** position_OX_func(char** data_matrix, char character, int *size, int *count){
-    int** position_matrix = matrix_allocate_int(*size, 2); // 创建一个 n*2 的matrix用来存 O/X 的坐标位置
+    int** position_matrix = matrix_allocate_int((*size)*(*size), 2); 
     int cnt = 0;
+    int tmp = 0;
     for(int i = 0; i < *size; ++i){
         for(int j = 0; j < *size; ++j){
             if (data_matrix[i][j] == character){
                 position_matrix[cnt][0] = i;
                 position_matrix[cnt][1] = j;
                 cnt++;
-                //printf("%d, i: %d, j: %d \n", count, i, j);
             }
         }
     }
-    *count = cnt;
-    // printf("x: %d, y: %d \n", position_matrix[1][0], position_matrix[1][1]);
+    *count = cnt; //  use count 
     return position_matrix;
 }
 
@@ -74,10 +73,10 @@ void modify_domain_matrix(int*** domain_matrix, int** position_matrix, int matri
         int pos_r = position_matrix[i][0];
         int pos_c = position_matrix[i][1];
         if (character == 'X'){
-            domain_matrix[pos_r][pos_c][0] = 0;
+            domain_matrix[pos_r][pos_c][1] = 1;
         }
         else{
-            domain_matrix[pos_r][pos_c][1] = 0;
+            domain_matrix[pos_r][pos_c][0] = 100;
         }
     }
 }
@@ -92,7 +91,7 @@ bool check_constraint_1(int* vector, int matrix_size){
     int num_of_X = sum % 100;
     int num_of_O = sum / 100;
 
-    if (num_of_O <= 3 && num_of_X <= 3){
+    if (num_of_O <= matrix_size / 2 && num_of_X <= matrix_size / 2){
         return true;
     }
 
@@ -105,13 +104,13 @@ bool check_constraint_1(int* vector, int matrix_size){
 }
 
 
-// 检查每行/每列不能有超过两个连续的相同元素
+// check constraint 2:
 bool check_constraint_2(int* vector, int matrix_size, int cur_index){
-    if(vector[2] == 0){ // 如果当前行/列上元素个数小于3， 直接返回true
+    if(vector[2] == 0){ // if number of elements < 3, return ture
         return true;
     }
 
-    // 检查当前数字和前一个数字是否相等，当前数字和前两个数字是否相等
+    // check whether numbers are equal
     if((vector[cur_index] == vector[cur_index - 1]) && (vector[cur_index] == vector[cur_index - 2])) {
         return false;
     }
@@ -121,18 +120,17 @@ bool check_constraint_2(int* vector, int matrix_size, int cur_index){
 
 
 bool check_constraint_3_row(int** puzzle_matrix, int r_num, int c_num, int matrix_size){
-    if (c_num != 5) { // c = 5 的时候代表占满了这一行，如果当前行还没有占满，则不检查与之前行的关系，默认为true
+    if (c_num != 5) { // if not full filled, return true
         return true;
     }
-    if (r_num == 0) { // 如果当前只便利到第一行，也默认是true
+    if (r_num == 0) { // if only first row, resturn true
         return true;
     }
 
     int* current_row = vector_allocate(matrix_size);
-    int** previous_rows = matrix_allocate_int(r_num, matrix_size); // r_num是index
-    // int* previous_row = vector_allocate(matrix_size);
+    int** previous_rows = matrix_allocate_int(r_num, matrix_size); 
 
-    for(int r = 0; r <= r_num; ++r){  // 这里r_num是index
+    for(int r = 0; r <= r_num; ++r){  
         for(int c = 0; c < matrix_size; ++c){
             if (r == r_num){
                 current_row[c] = puzzle_matrix[r][c];
@@ -142,13 +140,12 @@ bool check_constraint_3_row(int** puzzle_matrix, int r_num, int c_num, int matri
             }
         }
     } 
-    // 到这里，比如遍历到了第四行的最后一个元素，进入这个判断函数，那么原始的puzzle matrix为：
+    // e.g. 
     // [ 100 1   1   100 100 1   ]  -->  row0
     // [ 100 1   100 1   1   100 ]  -->  row1
     // [ 1   100 1   1   100 100 ]  -->  row2
     // [ 100 1   1   100 100 1   ]  -->  row3
-    // 那么通过上面的，current_row 是 row3, previous_rows是row0, row1, row2
-    // 我们需要依次比较row3和之前的所有row
+
 
     bool check_res = true;
     bool check_temp = true;
@@ -160,23 +157,24 @@ bool check_constraint_3_row(int** puzzle_matrix, int r_num, int c_num, int matri
         }
     }
 
+    vector_free(current_row, matrix_size);
+    matrix_free_int(previous_rows, r_num, matrix_size);
     return check_res;
 }
 
 
 bool check_constraint_3_col(int** puzzle_matrix, int r_num, int c_num, int matrix_size){
-    if (r_num != 5) { // r = 5 的时候代表占满了这一列，如果当前列还没有占满，则不检查与之前列的关系，默认为true
+    if (r_num != 5) {
         return true;
     }
-    if (c_num == 0) { // 如果当前只便利到第一列，也默认是true
+    if (c_num == 0) { 
         return true;
     }
 
     int* current_col = vector_allocate(matrix_size);
-    int** previous_cols = matrix_allocate_int(c_num, matrix_size); // r_num是index
-    // int* previous_row = vector_allocate(matrix_size);
+    int** previous_cols = matrix_allocate_int(c_num, matrix_size);
 
-    for(int c = 0; c <= c_num; ++c){  // 这里r_num是index
+    for(int c = 0; c <= c_num; ++c){  
         for(int r = 0; r < matrix_size; ++r){
             if (c == c_num){
                 current_col[r] = puzzle_matrix[r][c];
@@ -186,13 +184,6 @@ bool check_constraint_3_col(int** puzzle_matrix, int r_num, int c_num, int matri
             }
         }
     } 
-    // 到这里，比如遍历到了第四行的最后一个元素，进入这个判断函数，那么原始的puzzle matrix为：
-    // [ 100 1   1   100 100 1   ]  -->  row0
-    // [ 100 1   100 1   1   100 ]  -->  row1
-    // [ 1   100 1   1   100 100 ]  -->  row2
-    // [ 100 1   1   100 100 1   ]  -->  row3
-    // 那么通过上面的，current_row 是 row3, previous_rows是row0, row1, row2
-    // 我们需要依次比较row3和之前的所有row
 
     bool check_res = true;
     bool check_temp = true;
@@ -204,6 +195,8 @@ bool check_constraint_3_col(int** puzzle_matrix, int r_num, int c_num, int matri
         }
     }
 
+    vector_free(current_col, matrix_size);
+    matrix_free_int(previous_cols, c_num, matrix_size);
     return check_res;
 }
 
@@ -215,7 +208,130 @@ bool compare_array(int* array1, int* array2, int n){  // 两个array完全相等
     return true;
 }
 
-// TODO: final test function, test with three constraints for whole final matrix, can write three functions
+// final test function, test with three constraints for whole final matrix, can write three functions
+// check with generated matrix of constraint 1, each row and col has same number of O and X:
+bool final_check_constraint_1(char** puzzle_matrix, int matrix_size){
+
+    // check each row:
+    int cntx = 0, cnto = 0;
+    bool res = true;
+    for(int r = 0; r < matrix_size; ++r){
+        for(int c = 0; c < matrix_size; ++c){
+            if(puzzle_matrix[r][c] == 'O'){
+                ++cnto;
+            }else{
+                ++cntx;
+            }
+        }
+        if(cnto != (matrix_size / 2) || cntx != (matrix_size / 2)){
+            res = false;
+        }
+        cnto = 0, cntx = 0;
+    }
+
+    // check each col:
+    for(int c = 0; c < matrix_size; ++c){
+        for(int r = 0; r < matrix_size; ++r){
+            if(puzzle_matrix[r][c] == 'O'){
+                ++cnto;
+            }else{
+                ++cntx;
+            }
+        }
+        if(cnto != (matrix_size / 2) || cntx != (matrix_size / 2)){
+            res = false;
+        }
+        cnto = 0, cntx = 0;
+    }
+
+    return res;
+}
+
+//Check there is not a continues symbol
+bool final_check_constraint_2(char** puzzle_matrix, int matrix_size){
+    bool res = true;
+    for(int r = 0; r < matrix_size; ++r){
+        for(int c = 0; c < matrix_size - 2; ++c){
+            if(puzzle_matrix[r][c] == puzzle_matrix[r][c+1] && puzzle_matrix[r][c+1] == puzzle_matrix[r][c+2]){
+                res = false;
+            }
+        }
+    }
+    for(int c = 0; c < matrix_size; ++c){
+        for(int r = 0; r < matrix_size - 2; ++r){
+            if(puzzle_matrix[r][c] == puzzle_matrix[r+1][c] && puzzle_matrix[r+1][c] == puzzle_matrix[r+2][c]){
+                res = false;
+            }
+        }
+    }
+    return res;
+}
+
+//Check eaach row and column is unique
+bool final_check_constraint_3(char** puzzle_matrix, int matrix_size){
+    bool res = true;
+    int cnt = 0;
+    for(int c = 0; c < matrix_size; ++c){
+        for(int i = 0; i < matrix_size; ++i){
+            for(int j = i + 1; j < matrix_size; ++j){
+                if(puzzle_matrix[i][c] != puzzle_matrix[j][c]){
+                    ++cnt;
+                }
+                if(cnt == matrix_size){
+                    res = false;
+                }
+            }
+            cnt = 0;
+        }
+    }
+    cnt = 0;
+    for(int r = 0; r < matrix_size; ++r){
+        for(int i = 0; i < matrix_size; ++i){
+            for(int j = i + 1; j < matrix_size; ++j){
+                if(puzzle_matrix[r][i] != puzzle_matrix[r][j]){
+                    ++cnt;
+                }
+                if(cnt == matrix_size){
+                    res = false;
+                }
+            }
+            cnt = 0;
+        }
+    }
+    return res;
+}
+
+
+// print out final matrix
+void print_puzzle_result(char** puzzle_matrix, int matrix_size){
+    int cnt = 0;
+    for (int i = 0; i < matrix_size; ++i){
+        for(int j = 0; j < matrix_size; ++j){
+            printf("%c\t", puzzle_matrix[i][j]);
+            cnt++;
+        }
+        if (cnt % matrix_size == 0){
+            printf("\n");
+        }
+
+    }
+}
+
+char** substitude_to_OX(int** puzzle_matrix, int matrix_size){
+    char** OX_matrix = matrix_allocate_char(matrix_size, matrix_size);
+    for (int i = 0; i < matrix_size; ++i){
+        for (int j = 0; j < matrix_size; ++j){
+            if (puzzle_matrix[i][j] == 1){
+                OX_matrix[i][j] = 'X';
+            }
+            else {
+                OX_matrix[i][j] = 'O';
+            }
+        }
+    }
+    return OX_matrix;
+}
+
 
 /*
     allocate memory for int vector
@@ -317,15 +433,68 @@ int*** matrix_allocate_3D(int row_num, int col_num) {
 		}
         }
     }
-    // int value = 1;
-    // for (int a = 0; a < row_num; ++a){
-    //     for (int b = 0; b < col_num; ++b){
-    //         for (int c = 0; c < thick_num; ++c){
-    //             *(*(*(matrix+a)+b)+c) = value++;
-    //         }
-    //     }
-    // }
 	return matrix;
 }
 
-// TODO: memory free function
+// memory free functions
+void vector_free(int *vector, int vector_num) { 
+	if(vector_num < 0 || vector == NULL) {
+		printf("ERROR: cannot free vector\n");
+		return;
+	}
+
+	free(vector);
+	vector = NULL;
+
+	return;
+}
+
+
+void matrix_free_int(int **matrix, int row_num, int col_num) { 
+	if(row_num <= 0 || col_num <= 0 || matrix == NULL) {
+		printf("ERROR: cannot free matrix\n");
+		return;
+	}
+
+	for(int i = 0; i < row_num; i++) {
+		free(matrix[i]);
+		matrix[i] = NULL;
+	}
+	free(matrix);
+	matrix = NULL;
+
+	return;
+}
+
+void matrix_free_char(char **matrix, int row_num, int col_num) { 
+	if(row_num <= 0 || col_num <= 0 || matrix == NULL) {
+		printf("ERROR: cannot free matrix\n");
+		return;
+	}
+
+	for(int i = 0; i < row_num; i++) {
+		free(matrix[i]);
+		matrix[i] = NULL;
+	}
+	free(matrix);
+	matrix = NULL;
+
+	return;
+}
+
+void matrix_free_3D(int*** matrix, int row_num, int col_num) { 
+	if(row_num <= 0 || col_num <= 0 || matrix == NULL) {
+		printf("ERROR: cannot free matrix\n");
+		return;
+	}
+
+	for(int i = 0; i < row_num; i++) {
+        for (int j = 0; j < col_num; ++j){
+            free(matrix[i][j]);
+		}
+        free(matrix[i]);
+	}
+	free(matrix);
+
+	return;
+}
