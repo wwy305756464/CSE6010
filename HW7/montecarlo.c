@@ -11,7 +11,7 @@ int main (int argc, char* argv[]) {
     double e = 0.0;
     double begin=0.0, end=0.0; // time
     double x, y, y_p; // check particle
-    double y_max = 5.4365636;
+    double y_max = 5.4365636; // by 2 * 1 * exp(1*1)
     
     MPI_Init (&argc, &argv);
     
@@ -29,12 +29,13 @@ int main (int argc, char* argv[]) {
     int total = 0;
     
     // partial sum 
-    for (int i = rank; i < N; i += size)
-    {
+    for (int i = rank; i < N; i += size){
+        // calculate point position
         x = rand() / (RAND_MAX + 1.0);
         y = rand() / (RAND_MAX + 1.0) * y_max;
         y_p = 2 * x * exp(x * x);
         total++;
+        // under the curve 
         if(y <= y_p)
             result++;
     }
@@ -46,8 +47,7 @@ int main (int argc, char* argv[]) {
     end = MPI_Wtime();
     
     // calculate e:
-    if (rank==0)
-    {
+    if (rank==0){
         double e = ((double) result/ total) * y_max + 1;
         double e_true = exp(1);
         printf("number of threads: %d\n", size);
