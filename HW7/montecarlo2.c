@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
     }
 
     double e_true = exp(1);
-    double e = (double)count / total * y_max + 1;
+    double e = (double)count / N * y_max + 1;
 
     // printf("[+] total = %lld\n", total);
     // printf("[+] count = %lld\n", count);
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
     // printf("num_threads = %d\n", tn);
 
     printf("number of threads: %d\n", tn);
-    printf("number of points: %.0f\n", total);
+    printf("number of points: %.0f\n", N);
     printf("approximate e: %f\n", e);
     printf("theoretical e: %f\n", e_true);
     return 0;
