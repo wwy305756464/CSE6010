@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    double e_true = exp(1)
+    double e_true = exp(1);
     double e = (double)count / total * y_max + 1;
 
     // printf("[+] total = %lld\n", total);
