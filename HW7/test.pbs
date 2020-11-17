@@ -1,11 +1,13 @@
 # This is an example PBS script
-#PBS -N hello
+#PBS -N output
 #PBS -l nodes=2:ppn=8
 #PBS -l walltime=00:15:00
 #PBS -q coc-ice-multi
-#PBS -o hello.out#PBS -m abe
+#PBS -o output.out
+#PBS -m abe
 #PBS -M wwang413@gatech.edu
-cd ~/CSE6010/HW7/
+
+cd ~/CSE6010/HW7/montecarlo.c
 module load gcc mvapich2/2.2
 make
-mpirun -np 2 ./output.out
+mpirun -np 2 ./output
