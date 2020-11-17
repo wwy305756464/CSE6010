@@ -5,7 +5,7 @@
 #include <omp.h>
 
 int main(int argc, char* argv[]) {
-    long long total = atoi(argv[1]);
+    long long N = atoi(argv[1]);
     int tn = atoi(argv[2]);
 
 
@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 
         #pragma omp for private(x, y) reduction(+:count)
 
-        for(long long i = 0; i < total; i++) {
+        for(long long i = 0; i < N; i++) {
             x = (double)rand_r(&seed) / RAND_MAX;
             y = (double)rand_r(&seed) / RAND_MAX * y_max;
             y_check = 2 * x * exp(x * x);
