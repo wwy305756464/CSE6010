@@ -7,7 +7,8 @@
 #PBS -m abe
 #PBS -M wwang413@gatech.edu
 
-cd ~/CSE6010/HW7/montecarlo.c
+cd ~/CSE6010/HW7/
 module load gcc mvapich2/2.2
 make
 mpirun -np 2 ./output
+
