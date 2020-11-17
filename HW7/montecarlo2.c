@@ -21,7 +21,8 @@ int main(int argc, char* argv[]) {
     double x, y, y_check;
     double y_max = 5.4365636;
 
-    #pragma omp parallel num_threads(tn){
+    #pragma omp parallel num_threads(tn)
+    {
         unsigned seed = time(NULL);
 
         #pragma omp for private(x, y) reduction(+:count)
